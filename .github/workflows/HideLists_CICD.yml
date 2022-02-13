@@ -1,0 +1,73 @@
+name: HideListsWebPart-CICD
+
+on:
+  push:
+    branches: [ master ]
+    
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    
+    environment: Dev
+    env:
+      DEVSITEURL: ${{ secrets.DEV_DEVSITEURL }}
+      TENANT: ${{ secrets.DEV_TENANT }}
+      APPID: ${{ secrets.DEV_APPID }}
+      BASEENCODEDSTRING: ${{ secrets.DEV_BASEENCODEDSTRING }}
+      CERTPWD: ${{ secrets.DEV_CERTPWD }}
+    
+    steps:
+    # Checkout code
+    - name: Checkout code
+      uses: actions/checkout@v1
+      
+    # Setup node.js runtime
+    - name: Use Node.js 14.18.1
+      uses: actions/setup-node@v1
+      with:
+        node-version: 14.18.1
+        
+    # npm install
+    - name: Run npm install
+      run: |
+        npm install
+    
+    # gulp bundle and package solution
+    - name: Bundle 
+      run: |
+        gulp bundle --ship --warnoff
+        
+    # Package Solution
+    - name: Package Solution
+      run: |
+        gulp package-solution --ship 
+    
+    # Get Package Name and Set it to variable
+    - name: Set pkgname
+      id: get-pkgname
+      run: |
+        echo ::set-output name=pkgname::$(find . -name *.sppkg)
+        
+    # Output the Package Name
+    - name: Use the output
+      run: |
+        echo 'The output pkgname is ${{ steps.get-pkgname.outputs.pkgname }}' 
+        
+    # Deploy Package
+    - name: Connect To SharePoint And Deploy Package
+      run: |
+        Write-Host "Installing PnP Module"
+        Install-Module -Name PnP.PowerShell -Force -Scope "CurrentUser"
+        Write-Host "Connecting to SharePoint Site ${{ env.DEVSITEURL }}"
+        Connect-PnPOnline -Url ${{ env.DEVSITEURL }} -ClientId ${{ env.APPID }} -CertificateBase64Encoded ${{ env.BASEENCODEDSTRING }} -CertificatePassword (ConvertTo-SecureString -AsPlainText ${{ env.CERTPWD }} -Force) -Tenant ${{ env.TENANT }}
+        Write-Host "Deploying App Package"
+        Add-PnPApp -Scope Site -Publish -Overwrite -Path ${{ steps.get-pkgname.outputs.pkgname }}
+        Write-Host "Step Done"
+      shell: pwsh
+      
+    # Job Completed
+    - name: Job Completed
+      run: | 
+        echo 'Workflow Completed !!!'
+          
+        
