@@ -1,3 +1,3 @@
 export interface IHideListsProps {
-  description: string;
+  ctx: any;
 }

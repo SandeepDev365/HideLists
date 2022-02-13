@@ -9,7 +9,7 @@ import { BaseClientSideWebPart } from '@microsoft/sp-webpart-base';
 
 import * as strings from 'HideListsWebPartStrings';
 import HideLists from './components/HideLists';
-import { IHideListsProps } from './components/IHideListsProps';
+import { sp } from '@pnp/sp';
 
 export interface IHideListsWebPartProps {
   description: string;
@@ -17,11 +17,21 @@ export interface IHideListsWebPartProps {
 
 export default class HideListsWebPart extends BaseClientSideWebPart<IHideListsWebPartProps> {
 
+  private listsinSiteCollection = [];
+
+  protected onInit(): Promise<void> {
+    return super.onInit().then(_ => {
+      sp.setup({
+        spfxContext: this.context
+      });
+    });
+  }
+
   public render(): void {
-    const element: React.ReactElement<IHideListsProps> = React.createElement(
+    const element: React.ReactElement = React.createElement(
       HideLists,
       {
-        description: this.properties.description
+        ctx: this.context
       }
     );
 
