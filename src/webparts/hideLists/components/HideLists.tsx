@@ -23,8 +23,21 @@ export default class HideLists extends React.Component<IHideListsProps, IHideLis
       style: { whiteSpace: 'normal' },
       sortable: true,
       filterable: true,
+      width: 150,
       Cell: row => (
         <div className='trucateData'>{row.original.Title}</div>
+      )
+    },
+    {
+      Header: "List Type",
+      accessor: "BaseTemplate",
+      headerStyle: { whiteSpace: 'nowrap' },
+      style: { whiteSpace: 'normal' },
+      sortable: true,
+      filterable: true,
+      width: 120,
+      Cell: row => (
+        <div className='trucateData'>{row.original.BaseTemplate}</div>
       )
     },
     {
@@ -131,7 +144,7 @@ export default class HideLists extends React.Component<IHideListsProps, IHideLis
   }
 
   private async GetLists(): Promise<any> {
-    return sp.web.lists.get().then((lsData) => { //filter("Hidden eq false and BaseType ne 1")
+    return sp.web.lists.filter("BaseTemplate eq 100 or BaseTemplate eq 101 or BaseTemplate eq 106 or BaseTemplate eq 119").get().then((lsData) => { //filter("Hidden eq false and BaseType ne 1")
       console.log("Total number of lists are " + lsData.length);
       console.log("data", lsData);
       this.setState({ loading: false, data: lsData });
@@ -180,6 +193,10 @@ export default class HideLists extends React.Component<IHideListsProps, IHideLis
           defaultPageSize={5}
           pageSizeOptions={[5, 10, 15]}
           noDataText={"Sorry, No data to display!!!"}
+          defaultFilterMethod= {(filter, row, column) => {
+            const id = filter.pivotId || filter.id;
+            return row[id] !== undefined ? String(row[id]).toLowerCase().indexOf(filter.value.toLowerCase()) !== -1 : true;
+          }}
         />
 
         {/* <CalloutComponent _onCalloutDismiss={this._onCalloutDismiss} isCalloutVisible={isConfirmCallOutVisible} target={'#calloutdiv'} className='displayFormCallout'>
@@ -204,10 +221,6 @@ export default class HideLists extends React.Component<IHideListsProps, IHideLis
             setInitialFocus={true}
           >
             <MessageBar messageBarType={MessageBarType.warning} className='saveChanges' isMultiline={true} actions={
-              // <div className='text-right mt20'>
-              //   <MessageBarButton className='button custButton' onClick={(event) => this.onConfirmationMessageYesClicked(event)}>Yes</MessageBarButton>
-              //   <MessageBarButton className='button custButton' onClick={(event) => this.onConfirmationMessageNoClicked(event)}>No</MessageBarButton>
-              // </div>
               <FocusZone handleTabKey={FocusZoneTabbableElements.all} isCircularNavigation>
                 <Stack className='button custButton' gap={8} horizontal>
                   <PrimaryButton onClick={(event) => this.onConfirmationMessageYesClicked(event)}>Yes</PrimaryButton>
