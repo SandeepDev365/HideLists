@@ -5,6 +5,7 @@ import { IHideListsState } from './IHideListsState';
 import { sp } from "@pnp/sp";
 import "@pnp/sp/webs";
 import "@pnp/sp/lists";
+import "@pnp/sp/site-users/web";
 import { SPHttpClient, SPHttpClientResponse, SPHttpClientConfiguration, ISPHttpClientOptions } from '@microsoft/sp-http';
 import ReactTable from "react-table-6";
 import 'react-table-6/react-table.css';
@@ -89,6 +90,7 @@ export default class HideLists extends React.Component<IHideListsProps, IHideLis
     this.state = {
       data: [],
       rowData: null,
+      user: null,
       loading: false,
       loadingText: "",
       isCalloutVisible: false,
@@ -101,6 +103,16 @@ export default class HideLists extends React.Component<IHideListsProps, IHideLis
     //this.hideUnhideLoader(true);
     await this.GetLists();
     //this.hideUnhideLoader(false);
+    await this.checkifUserisAdmin();
+  }
+
+  private async checkifUserisAdmin() {
+    await sp.web.currentUser().then((userObj) => {
+      this.setState({ user: userObj }, () => {
+        console.log("user", this.state.user);
+        console.log("isAdmin", this.state.user.IsSiteAdmin);
+      });
+    });
   }
 
   private hideUnhideLoader(flag: boolean) {
@@ -174,64 +186,76 @@ export default class HideLists extends React.Component<IHideListsProps, IHideLis
   }
 
   public render(): React.ReactElement {
-    let { loading, loadingText, isCalloutVisible, isConfirmCallOutVisible, isConfirmCalloutMessage, data } = this.state;
+    let { loading, loadingText, isCalloutVisible, isConfirmCallOutVisible, isConfirmCalloutMessage, data, user } = this.state;
     let btnId = this.state.rowData ? "btn" + this.state.rowData.index : "";
     console.log("columns", this.columns);
     console.log("data", data);
     return (
       <div>
         {/* <Loader loading={loading} loadingText={loadingText}/> */}
-        <div>
-          Site Url: <b>{this.props.ctx.pageContext.web.absoluteUrl}</b><br />
-          Total Number of lists in the Site are <b>{data.length}</b>
+        {
+           user && user.IsSiteAdmin ?
+           <div>
+           <div>
+             Site Url: <b>{this.props.ctx.pageContext.web.absoluteUrl}</b><br />
+             Total Number of lists in the Site are <b>{data.length}</b>
+           </div>
+           <br />
+           <ReactTable
+             columns={this.columns}
+             data={data}
+             minRows={0}
+             defaultPageSize={5}
+             pageSizeOptions={[5, 10, 15]}
+             noDataText={"Sorry, No data to display!!!"}
+             defaultFilterMethod={(filter, row, column) => {
+               const id = filter.pivotId || filter.id;
+               return row[id] !== undefined ? String(row[id]).toLowerCase().indexOf(filter.value.toLowerCase()) !== -1 : true;
+             }}
+           />
+ 
+           {/* <CalloutComponent _onCalloutDismiss={this._onCalloutDismiss} isCalloutVisible={isConfirmCallOutVisible} target={'#calloutdiv'} className='displayFormCallout'>
+           <MessageBar messageBarType={MessageBarType.warning} className='saveChanges' isMultiline={true} actions={
+             <div className='text-right mt20'>
+               <MessageBarButton className='button custButton' onClick={(event) => this.onConfirmationMessageYesClicked(event)}>Yes</MessageBarButton>
+               <MessageBarButton className='button custButton' onClick={(event) => this.onConfirmationMessageNoClicked(event)}>No</MessageBarButton>
+             </div>
+           }>
+             {isConfirmCalloutMessage}
+           </MessageBar>
+         </CalloutComponent> */}
+           {isConfirmCallOutVisible && (
+             <FocusTrapCallout
+               className='ms-CalloutExample-callout'
+               ariaLabelledBy={'callout-label-1'}
+               ariaDescribedBy={'callout-description-1'}
+               role={'alertdialog'}
+               gapSpace={0}
+               target={`#${btnId}`}
+               onDismiss={this._onCalloutDismiss}
+               setInitialFocus={true}
+             >
+               <MessageBar messageBarType={MessageBarType.warning} className='saveChanges' isMultiline={true} actions={
+                 <FocusZone handleTabKey={FocusZoneTabbableElements.all} isCircularNavigation>
+                   <Stack className='button custButton' gap={8} horizontal>
+                     <PrimaryButton onClick={(event) => this.onConfirmationMessageYesClicked(event)}>Yes</PrimaryButton>
+                     <DefaultButton onClick={(event) => this.onConfirmationMessageNoClicked(event)}>No</DefaultButton>
+                   </Stack>
+                 </FocusZone>
+               }>
+                 {isConfirmCalloutMessage}
+               </MessageBar>
+             </FocusTrapCallout>
+           )}
+         </div>
+         :
+         <div>
+           <MessageBar messageBarType={MessageBarType.error} className='saveChanges' isMultiline={true}>
+             Sorry!!! This tool is only for Site Admins...
+           </MessageBar>
         </div>
-        <br />
-        <ReactTable
-          columns={this.columns}
-          data={data}
-          minRows={0}
-          defaultPageSize={5}
-          pageSizeOptions={[5, 10, 15]}
-          noDataText={"Sorry, No data to display!!!"}
-          defaultFilterMethod= {(filter, row, column) => {
-            const id = filter.pivotId || filter.id;
-            return row[id] !== undefined ? String(row[id]).toLowerCase().indexOf(filter.value.toLowerCase()) !== -1 : true;
-          }}
-        />
-
-        {/* <CalloutComponent _onCalloutDismiss={this._onCalloutDismiss} isCalloutVisible={isConfirmCallOutVisible} target={'#calloutdiv'} className='displayFormCallout'>
-          <MessageBar messageBarType={MessageBarType.warning} className='saveChanges' isMultiline={true} actions={
-            <div className='text-right mt20'>
-              <MessageBarButton className='button custButton' onClick={(event) => this.onConfirmationMessageYesClicked(event)}>Yes</MessageBarButton>
-              <MessageBarButton className='button custButton' onClick={(event) => this.onConfirmationMessageNoClicked(event)}>No</MessageBarButton>
-            </div>
-          }>
-            {isConfirmCalloutMessage}
-          </MessageBar>
-        </CalloutComponent> */}
-        {isConfirmCallOutVisible && (
-          <FocusTrapCallout
-            className='ms-CalloutExample-callout'
-            ariaLabelledBy={'callout-label-1'}
-            ariaDescribedBy={'callout-description-1'}
-            role={'alertdialog'}
-            gapSpace={0}
-            target={`#${btnId}`}
-            onDismiss={this._onCalloutDismiss}
-            setInitialFocus={true}
-          >
-            <MessageBar messageBarType={MessageBarType.warning} className='saveChanges' isMultiline={true} actions={
-              <FocusZone handleTabKey={FocusZoneTabbableElements.all} isCircularNavigation>
-                <Stack className='button custButton' gap={8} horizontal>
-                  <PrimaryButton onClick={(event) => this.onConfirmationMessageYesClicked(event)}>Yes</PrimaryButton>
-                  <DefaultButton onClick={(event) => this.onConfirmationMessageNoClicked(event)}>No</DefaultButton>
-                </Stack>
-              </FocusZone>
-            }>
-              {isConfirmCalloutMessage}
-            </MessageBar>
-          </FocusTrapCallout>
-        )}
+        }
+        
       </div>
     );
   }
