@@ -2,9 +2,9 @@
 
 ## Summary
 
-Short summary on functionality and used technologies.
+SPFx Webpart to Hide/UnHide lists in a Site Collection
 
-[picture of the solution in action, if possible]
+![HideLists WebPart](./Images/HideListWebPartImg.png)
 
 ## Used SharePoint Framework Version
 
@@ -19,20 +19,19 @@ Short summary on functionality and used technologies.
 
 ## Prerequisites
 
-> Any special pre-requisites?
+> Access to SharePoint Site
 
 ## Solution
 
 Solution|Author(s)
 --------|---------
-folder name | Author details (name, company, twitter alias with link)
+src| Sandeep Unnikrishnan
 
 ## Version history
 
 Version|Date|Comments
 -------|----|--------
-1.1|March 10, 2021|Update comment
-1.0|January 29, 2021|Initial release
+1.0|February 27, 2022|Working Version
 
 ## Disclaimer
 
@@ -46,28 +45,22 @@ Version|Date|Comments
 - Ensure that you are at the solution folder
 - in the command-line run:
   - **npm install**
+  - **Update your SharePoint Site Url**
   - **gulp serve**
 
-> Include any additional steps as needed.
 
 ## Features
 
-Description of the extension that expands upon high-level summary above.
+As Site Admins we may need to hide some lists or libraries from other users who have access to the lists/libraries.
 
-This extension illustrates the following concepts:
+For example: we may have created a PowerApps form and need to hide master lists or Logs list which has to be kept hidden from end users though they have Read permissions or Edit permissions to the lists/libraries.
 
-- topic 1
-- topic 2
-- topic 3
+Here we will be achieving the same functionality using SPFx Webpart, which we can just add to a Site Collection and it will list out the lists and libraries in the site and Site Admin can Hide/Unhide lists with a simple button click.
 
-> Notice that better pictures and documentation will increase the sample usage and the value you are providing for others. Thanks for your submissions advance.
-
-> Share your web part with others through Microsoft 365 Patterns and Practices program to get visibility and exposure. More details on the community, open-source projects and other activities from http://aka.ms/m365pnp.
+![HideLists WebPart](./Images/CallOutImg.png)
 
 ## References
 
 - [Getting started with SharePoint Framework](https://docs.microsoft.com/en-us/sharepoint/dev/spfx/set-up-your-developer-tenant)
-- [Building for Microsoft teams](https://docs.microsoft.com/en-us/sharepoint/dev/spfx/build-for-teams-overview)
-- [Use Microsoft Graph in your solution](https://docs.microsoft.com/en-us/sharepoint/dev/spfx/web-parts/get-started/using-microsoft-graph-apis)
-- [Publish SharePoint Framework applications to the Marketplace](https://docs.microsoft.com/en-us/sharepoint/dev/spfx/publish-to-marketplace-overview)
-- [Microsoft 365 Patterns and Practices](https://aka.ms/m365pnp) - Guidance, tooling, samples and open-source controls for your Microsoft 365 development
+- [List Template Types](https://docs.microsoft.com/en-us/previous-versions/office/sharepoint-visio/jj245053(v=office.15)?redirectedfrom=MSDN)
+- [Fluent UI Controls](https://developer.microsoft.com/en-us/fluentui#/controls/web/callout)
