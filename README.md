@@ -45,7 +45,7 @@ Version|Date|Comments
 - Ensure that you are at the solution folder
 - in the command-line run:
   - **npm install**
-  - **Update your SharePoint Site Url**
+  - **Update your SharePoint Site Url in serve.json**
   - **gulp serve**
 
 
