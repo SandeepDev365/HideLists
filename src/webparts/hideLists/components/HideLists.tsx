@@ -91,8 +91,6 @@ export default class HideLists extends React.Component<IHideListsProps, IHideLis
       data: [],
       rowData: null,
       user: null,
-      loading: false,
-      loadingText: "",
       isCalloutVisible: false,
       isConfirmCalloutMessage: "",
       isConfirmCallOutVisible: false
@@ -100,9 +98,7 @@ export default class HideLists extends React.Component<IHideListsProps, IHideLis
   }
 
   public async componentDidMount() {
-    //this.hideUnhideLoader(true);
     await this.GetLists();
-    //this.hideUnhideLoader(false);
     await this.checkifUserisAdmin();
   }
 
@@ -113,10 +109,6 @@ export default class HideLists extends React.Component<IHideListsProps, IHideLis
         console.log("isAdmin", this.state.user.IsSiteAdmin);
       });
     });
-  }
-
-  private hideUnhideLoader(flag: boolean) {
-    this.setState({ loading: flag });
   }
 
   private async unHideList() {
@@ -159,7 +151,7 @@ export default class HideLists extends React.Component<IHideListsProps, IHideLis
     return sp.web.lists.filter("BaseTemplate eq 100 or BaseTemplate eq 101 or BaseTemplate eq 106 or BaseTemplate eq 119").get().then((lsData) => { //filter("Hidden eq false and BaseType ne 1")
       console.log("Total number of lists are " + lsData.length);
       console.log("data", lsData);
-      this.setState({ loading: false, data: lsData });
+      this.setState({ data: lsData });
     });
   }
 
@@ -186,13 +178,12 @@ export default class HideLists extends React.Component<IHideListsProps, IHideLis
   }
 
   public render(): React.ReactElement {
-    let { loading, loadingText, isCalloutVisible, isConfirmCallOutVisible, isConfirmCalloutMessage, data, user } = this.state;
+    let { isCalloutVisible, isConfirmCallOutVisible, isConfirmCalloutMessage, data, user } = this.state;
     let btnId = this.state.rowData ? "btn" + this.state.rowData.index : "";
     console.log("columns", this.columns);
     console.log("data", data);
     return (
       <div>
-        {/* <Loader loading={loading} loadingText={loadingText}/> */}
         {
            user && user.IsSiteAdmin ?
            <div>
@@ -214,16 +205,6 @@ export default class HideLists extends React.Component<IHideListsProps, IHideLis
              }}
            />
  
-           {/* <CalloutComponent _onCalloutDismiss={this._onCalloutDismiss} isCalloutVisible={isConfirmCallOutVisible} target={'#calloutdiv'} className='displayFormCallout'>
-           <MessageBar messageBarType={MessageBarType.warning} className='saveChanges' isMultiline={true} actions={
-             <div className='text-right mt20'>
-               <MessageBarButton className='button custButton' onClick={(event) => this.onConfirmationMessageYesClicked(event)}>Yes</MessageBarButton>
-               <MessageBarButton className='button custButton' onClick={(event) => this.onConfirmationMessageNoClicked(event)}>No</MessageBarButton>
-             </div>
-           }>
-             {isConfirmCalloutMessage}
-           </MessageBar>
-         </CalloutComponent> */}
            {isConfirmCallOutVisible && (
              <FocusTrapCallout
                className='ms-CalloutExample-callout'
