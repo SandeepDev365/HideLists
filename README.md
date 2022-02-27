@@ -4,7 +4,7 @@
 
 SPFx Webpart to Hide/UnHide lists in a Site Collection
 
-![HideLists WebPart](./Images/HideListWebPartImg.png)
+![HideLists WebPart](./assets/HideListWebPartImg.png)
 
 ## Used SharePoint Framework Version
 
@@ -51,13 +51,21 @@ Version|Date|Comments
 
 ## Features
 
-As Site Admins we may need to hide some lists or libraries from other users who have access to the lists/libraries.
+As Site Admins we may need to hide some lists or libraries in Site Contents from other users who have access to the lists/libraries.
 
 For example: we may have created a PowerApps form and need to hide master lists or Logs list which has to be kept hidden from end users though they have Read permissions or Edit permissions to the lists/libraries.
 
+So that once the list is hidden, users cannot access the list directly from Site Contents or without knowing list name or list URL.
+
+There are multiple ways to do this by using PowerShell Scripts, Rest Api & MS Flows.
+
 Here we will be achieving the same functionality using SPFx Webpart, which we can just add to a Site Collection and it will list out the lists and libraries in the site and Site Admin can Hide/Unhide lists with a simple button click.
 
-![HideLists WebPart](./Images/CallOutImg.png)
+This Webpart will be accessible only to users with Site Collection Admin access.
+
+We will be using PnP Js library to get relevant SharePoint lists and libraries from current Site Collection and use "Hidden" property of lists to hide/Unhide.
+
+![HideLists WebPart](./assets/CallOutImg.png)
 
 ## References
 
